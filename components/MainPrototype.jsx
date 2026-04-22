@@ -8,6 +8,15 @@ const MainPrototype = ({ dataset, compact = false }) => {
   const [rotation, setRotation] = React.useState({ lng: dataset.focus.lng, lat: dataset.focus.lat });
   const [selectedEvent, setSelectedEvent] = React.useState(null);
   const [layers, setLayers] = React.useState({ territory: true, capital: false, religion: false });
+  const [geoReady, setGeoReady] = React.useState(!!window.KOREA_PENINSULA);
+
+  // 한반도 실제 해안선 데이터 로드 완료 시 리렌더
+  React.useEffect(() => {
+    if (window.KOREA_PENINSULA) return;
+    if (window.KOREA_PENINSULA_READY) {
+      window.KOREA_PENINSULA_READY.then(() => setGeoReady(true));
+    }
+  }, []);
 
   // Tweaks 동기화
   React.useEffect(() => {
@@ -110,6 +119,7 @@ const MainPrototype = ({ dataset, compact = false }) => {
         <GlobeMap
           year={year}
           data={dataset}
+          geoReady={geoReady}
           rotation={rotation}
           onRotate={setRotation}
           onEventPin={(ev) => setSelectedEvent(ev)}
@@ -120,6 +130,7 @@ const MainPrototype = ({ dataset, compact = false }) => {
       <Timeline
         year={year} setYear={setYear}
         data={dataset}
+          geoReady={geoReady}
         onEventClick={(ev) => setSelectedEvent(ev)}
         playing={playing} setPlaying={setPlaying}
         playSpeed={playSpeed}
@@ -130,6 +141,7 @@ const MainPrototype = ({ dataset, compact = false }) => {
         <EventModal
           event={selectedEvent}
           data={dataset}
+          geoReady={geoReady}
           onClose={() => setSelectedEvent(null)}
           onSelectEvent={(ev) => setSelectedEvent(ev)}
         />
@@ -142,6 +154,11 @@ const MainPrototype = ({ dataset, compact = false }) => {
 const VariantSidebar = ({ dataset }) => {
   const [year, setYear] = React.useState(676);
   const [selectedEvent, setSelectedEvent] = React.useState(null);
+  const [geoReady, setGeoReady] = React.useState(!!window.KOREA_PENINSULA);
+  React.useEffect(() => {
+    if (window.KOREA_PENINSULA) return;
+    window.KOREA_PENINSULA_READY?.then(() => setGeoReady(true));
+  }, []);
   const [rotation, setRotation] = React.useState({ lng: dataset.focus.lng, lat: dataset.focus.lat });
 
   const sortedEvents = [...dataset.events].sort((a, b) => a.year - b.year);
@@ -215,6 +232,7 @@ const VariantSidebar = ({ dataset }) => {
         <GlobeMap
           year={year}
           data={dataset}
+          geoReady={geoReady}
           rotation={rotation}
           onRotate={setRotation}
           onEventPin={(ev) => setSelectedEvent(ev)}
@@ -231,6 +249,7 @@ const VariantSidebar = ({ dataset }) => {
 
       {selectedEvent && (
         <EventModal event={selectedEvent} data={dataset}
+          geoReady={geoReady}
           onClose={() => setSelectedEvent(null)}
           onSelectEvent={(ev) => { setYear(ev.year); setSelectedEvent(ev); }}
         />
@@ -243,6 +262,11 @@ const VariantSidebar = ({ dataset }) => {
 const VariantFullscreen = ({ dataset }) => {
   const [year, setYear] = React.useState(1446);
   const [rotation, setRotation] = React.useState({ lng: dataset.focus.lng, lat: dataset.focus.lat });
+  const [geoReady, setGeoReady] = React.useState(!!window.KOREA_PENINSULA);
+  React.useEffect(() => {
+    if (window.KOREA_PENINSULA) return;
+    window.KOREA_PENINSULA_READY?.then(() => setGeoReady(true));
+  }, []);
   const [selectedEvent, setSelectedEvent] = React.useState(null);
   const [playing, setPlaying] = React.useState(false);
   const formatYear = (y) => y < 0 ? `BCE ${-y}` : `${y}`;
@@ -262,6 +286,7 @@ const VariantFullscreen = ({ dataset }) => {
         <GlobeMap
           year={year}
           data={dataset}
+          geoReady={geoReady}
           rotation={rotation}
           onRotate={setRotation}
           onEventPin={(ev) => setSelectedEvent(ev)}
@@ -346,6 +371,7 @@ const VariantFullscreen = ({ dataset }) => {
 
       {selectedEvent && (
         <EventModal event={selectedEvent} data={dataset}
+          geoReady={geoReady}
           onClose={() => setSelectedEvent(null)}
           onSelectEvent={(ev) => { setYear(ev.year); setSelectedEvent(ev); }}
         />
