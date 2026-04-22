@@ -11,6 +11,13 @@ export default function MainPrototype({ dataset, compact = false }) {
   const [playSpeed, setPlaySpeed] = useState(8);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [layers, setLayers] = useState({ territory: true, capital: false, religion: false });
+  // geoReady: true once coastline geo-data is available in the browser
+  const [geoReady, setGeoReady] = useState(false);
+
+  useEffect(() => {
+    // Signal ready immediately; coastline data loaded from static imports in Next.js
+    setGeoReady(true);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') setSelectedEvent(null); };
@@ -69,11 +76,7 @@ export default function MainPrototype({ dataset, compact = false }) {
         </div>
 
         <div style={{ display: 'flex', gap: 4, background: '#f4f1e8', padding: 3, borderRadius: 6 }}>
-          {[
-            { id: 'territory', label: '영토' },
-            { id: 'religion', label: '종교' },
-            { id: 'capital', label: '수도' },
-          ].map(l => (
+          {[{ id: 'territory', label: '영토' }, { id: 'religion', label: '종교' }, { id: 'capital', label: '수도' }].map(l => (
             <button key={l.id}
               onClick={() => setLayers({ ...layers, [l.id]: !layers[l.id] })}
               style={{
@@ -95,6 +98,7 @@ export default function MainPrototype({ dataset, compact = false }) {
         <GlobeMap
           year={year}
           data={dataset}
+          geoReady={geoReady}
           onEventPin={(ev) => setSelectedEvent(ev)}
         />
       </div>
@@ -102,6 +106,7 @@ export default function MainPrototype({ dataset, compact = false }) {
       <Timeline
         year={year} setYear={setYear}
         data={dataset}
+        geoReady={geoReady}
         onEventClick={(ev) => setSelectedEvent(ev)}
         playing={playing} setPlaying={setPlaying}
         playSpeed={playSpeed}
@@ -111,6 +116,7 @@ export default function MainPrototype({ dataset, compact = false }) {
         <EventModal
           event={selectedEvent}
           data={dataset}
+          geoReady={geoReady}
           onClose={() => setSelectedEvent(null)}
           onSelectEvent={(ev) => setSelectedEvent(ev)}
         />
