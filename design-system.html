@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>U-Origins — Design System v1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; height: 100%; width: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<!-- Design tokens -->
+<script src="./design/tokens.js"></script>
+
+<!-- DesignCanvas infrastructure -->
+<script type="text/babel" data-presets="react" src="./design-canvas.jsx"></script>
+
+<!-- Design system showcase -->
+<script type="text/babel" data-presets="react" src="./design/DesignSystemCanvas.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<DesignSystemCanvas />);
+</script>
+</body>
+</html>
