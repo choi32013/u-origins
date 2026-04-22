@@ -1,11 +1,9 @@
-// Timeline.jsx — 하단 가로형 타임라인 스크럽바
-// - 시대 구분 띠 배경
-// - 사건 핀 (클릭 가능)
-// - 드래그 스크럽
-// - 자동 재생
+'use client';
 
-const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, playSpeed }) => {
-  const trackRef = React.useRef(null);
+import { useRef, useEffect } from 'react';
+
+export default function Timeline({ year, setYear, data, onEventClick, playing, setPlaying, playSpeed }) {
+  const trackRef = useRef(null);
   const [min, max] = data.range;
   const pct = (year - min) / (max - min);
 
@@ -27,8 +25,7 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
     window.addEventListener('mouseup', onUp);
   };
 
-  // 자동 재생
-  React.useEffect(() => {
+  useEffect(() => {
     if (!playing) return;
     const id = setInterval(() => {
       setYear((y) => {
@@ -43,13 +40,10 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
 
   const formatYear = (y) => y < 0 ? `BCE ${-y}` : `${y}`;
 
-  // 주요 연도 눈금
   const ticks = [];
   const tickStep = 500;
   const firstTick = Math.ceil(min / tickStep) * tickStep;
-  for (let y = firstTick; y <= max; y += tickStep) {
-    ticks.push(y);
-  }
+  for (let y = firstTick; y <= max; y += tickStep) ticks.push(y);
 
   return (
     <div style={{
@@ -58,7 +52,6 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
       padding: '16px 24px 20px',
       fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
     }}>
-      {/* 상단 컨트롤 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
         <button
           onClick={() => setPlaying(!playing)}
@@ -90,33 +83,22 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
         </div>
       </div>
 
-      {/* 트랙 */}
       <div
         ref={trackRef}
         onMouseDown={onMouseDown}
-        style={{
-          position: 'relative',
-          height: 72,
-          cursor: 'pointer',
-          userSelect: 'none',
-        }}
+        style={{ position: 'relative', height: 72, cursor: 'pointer', userSelect: 'none' }}
       >
-        {/* 시대 띠 */}
         <div style={{ position: 'absolute', top: 20, left: 0, right: 0, height: 26, borderRadius: 4, overflow: 'hidden', display: 'flex' }}>
           {data.eras.map((era) => {
             const left = ((era.start - min) / (max - min)) * 100;
             const width = ((era.end - era.start) / (max - min)) * 100;
             return (
               <div key={era.id} style={{
-                position: 'absolute',
-                left: `${left}%`, width: `${width}%`,
-                height: '100%',
-                background: era.color,
-                borderRight: '1px solid rgba(0,0,0,0.06)',
+                position: 'absolute', left: `${left}%`, width: `${width}%`, height: '100%',
+                background: era.color, borderRight: '1px solid rgba(0,0,0,0.06)',
                 fontSize: 10, color: '#3a352d',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden', whiteSpace: 'nowrap',
-                letterSpacing: 0.3, fontWeight: 500,
+                overflow: 'hidden', whiteSpace: 'nowrap', letterSpacing: 0.3, fontWeight: 500,
               }}>
                 {width > 3 ? era.label : ''}
               </div>
@@ -124,7 +106,6 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
           })}
         </div>
 
-        {/* 눈금 */}
         {ticks.map((t) => {
           const left = ((t - min) / (max - min)) * 100;
           return (
@@ -135,7 +116,6 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
           );
         })}
 
-        {/* 사건 핀 */}
         {data.events.map((ev) => {
           const left = ((ev.year - min) / (max - min)) * 100;
           const isActive = Math.abs(ev.year - year) < 8;
@@ -144,47 +124,24 @@ const Timeline = ({ year, setYear, data, onEventClick, playing, setPlaying, play
               key={ev.id}
               onClick={(e) => { e.stopPropagation(); onEventClick && onEventClick(ev); }}
               onMouseDown={(e) => e.stopPropagation()}
-              style={{
-                position: 'absolute',
-                left: `${left}%`, top: 8,
-                transform: 'translateX(-50%)',
-                cursor: 'pointer',
-                zIndex: isActive ? 3 : 2,
-              }}
+              style={{ position: 'absolute', left: `${left}%`, top: 8, transform: 'translateX(-50%)', cursor: 'pointer', zIndex: isActive ? 3 : 2 }}
               title={`${formatYear(ev.year)} · ${ev.label}`}
             >
               <div style={{
-                width: isActive ? 12 : 8,
-                height: isActive ? 12 : 8,
-                borderRadius: '50%',
-                background: isActive ? '#c25b3f' : '#2a251f',
-                border: '2px solid #fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                width: isActive ? 12 : 8, height: isActive ? 12 : 8,
+                borderRadius: '50%', background: isActive ? '#c25b3f' : '#2a251f',
+                border: '2px solid #fff', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                 transition: 'all 0.15s',
               }} />
             </div>
           );
         })}
 
-        {/* 현재 위치 플레이헤드 */}
-        <div style={{
-          position: 'absolute',
-          left: `${pct * 100}%`, top: 0,
-          transform: 'translateX(-50%)',
-          height: '100%',
-          pointerEvents: 'none',
-        }}>
+        <div style={{ position: 'absolute', left: `${pct * 100}%`, top: 0, transform: 'translateX(-50%)', height: '100%', pointerEvents: 'none' }}>
           <div style={{ width: 2, height: '100%', background: '#c25b3f' }} />
-          <div style={{
-            position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
-            width: 14, height: 14, borderRadius: '50%',
-            background: '#c25b3f', border: '3px solid #fff',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-          }} />
+          <div style={{ position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)', width: 14, height: 14, borderRadius: '50%', background: '#c25b3f', border: '3px solid #fff', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} />
         </div>
       </div>
     </div>
   );
-};
-
-window.Timeline = Timeline;
+}
