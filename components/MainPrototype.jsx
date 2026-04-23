@@ -99,6 +99,7 @@ export default function MainPrototype({ dataset, compact = false }) {
           year={year}
           data={dataset}
           geoReady={geoReady}
+          layers={layers}
           onEventPin={(ev) => setSelectedEvent(ev)}
         />
       </div>

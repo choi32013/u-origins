@@ -3,6 +3,8 @@
 // 나중에 world-history.js, china-history.js 등을 같은 스키마로 추가 가능
 // 각 event 는 causes[] / effects[] 로 인과관계를 연결 (id 참조)
 
+import { KOREA_TERRITORIES } from '../lib/buildKoreaTerritories.js';
+
 const koreaHistory = {
   id: 'korea',
   label: '한국사',
@@ -247,57 +249,7 @@ const koreaHistory = {
     },
   ],
 
-  // 영토 스냅샷 — 특정 연도의 국가별 영역
-  // coords 는 [lng, lat] 순서 (지도 라이브러리 호환용). 단순화된 다각형.
-  territoriesByYear: [
-    {
-      year: -500,
-      polities: [
-        { id: 'gojoseon', name: '고조선', color: '#8B6F47', coords: [[123,38],[127,42],[130,42],[130,38],[127,37],[123,38]] },
-      ],
-    },
-    {
-      year: 100,
-      polities: [
-        { id: 'goguryeo', name: '고구려', color: '#C25B3F', coords: [[122,40],[127,43],[131,42],[131,38],[127,38],[122,40]] },
-        { id: 'baekje',   name: '백제',   color: '#4A7A8C', coords: [[126,36],[128,37.5],[128,35],[126.3,34],[126,36]] },
-        { id: 'silla',    name: '신라',   color: '#C9A83E', coords: [[128,35],[129.5,36.5],[129.8,35.5],[129,34.5],[128,35]] },
-      ],
-    },
-    {
-      year: 450,
-      polities: [
-        { id: 'goguryeo', name: '고구려', color: '#C25B3F', coords: [[121,40],[127,44],[132,43],[132,37],[126,36.5],[121,40]] },
-        { id: 'baekje',   name: '백제',   color: '#4A7A8C', coords: [[126,36.5],[127.5,37],[127.5,35],[126.3,34],[126,36.5]] },
-        { id: 'silla',    name: '신라',   color: '#C9A83E', coords: [[127.5,35],[129.8,36.7],[130,35.3],[128,34.5],[127.5,35]] },
-      ],
-    },
-    {
-      year: 700,
-      polities: [
-        { id: 'unifiedsilla', name: '통일신라', color: '#C9A83E', coords: [[124.8,38.5],[127,39],[130,38],[129.5,35],[126.3,34],[124.8,38.5]] },
-        { id: 'balhae',       name: '발해',     color: '#6B8E5A', coords: [[122,39],[125,44],[132,45],[133,42],[129,39],[122,39]] },
-      ],
-    },
-    {
-      year: 1000,
-      polities: [
-        { id: 'goryeo', name: '고려', color: '#7A5B3F', coords: [[124.5,39.5],[127,40.5],[130,38],[129.5,35],[126.3,34],[124.5,39.5]] },
-      ],
-    },
-    {
-      year: 1400,
-      polities: [
-        { id: 'joseon', name: '조선', color: '#5A7A5A', coords: [[124.5,40],[127,43],[130.5,43],[130,38],[129.5,35],[126.3,34],[124.5,40]] },
-      ],
-    },
-    {
-      year: 1800,
-      polities: [
-        { id: 'joseon', name: '조선', color: '#5A7A5A', coords: [[124.5,40],[127,43],[130.5,43],[130,38],[129.5,35],[126.3,34],[124.5,40]] },
-      ],
-    },
-  ],
+  territoriesByYear: KOREA_TERRITORIES,
 };
 
 export default koreaHistory;

@@ -1,12 +1,4 @@
-import type { HistoryDataset, HistoricalEvent, EventCategory } from '../types/history';
-
-const VALID_CATEGORIES: EventCategory[] = [
-  'war',
-  'dynasty',
-  'culture',
-  'religion',
-  'discovery',
-];
+import type { HistoryDataset, HistoricalEvent } from '../types/history';
 
 export interface ValidationError {
   eventId: string;
@@ -28,27 +20,20 @@ function validateEvent(event: HistoricalEvent): ValidationError[] {
   if (typeof event.year !== 'number' || !Number.isFinite(event.year)) {
     errors.push({ eventId: event.id, field: 'year', message: 'year는 유한한 숫자여야 합니다' });
   }
-  if (event.endYear !== undefined && event.endYear <= event.year) {
-    errors.push({ eventId: event.id, field: 'endYear', message: 'endYear는 year보다 커야 합니다' });
+  if (!event.label || event.label.trim() === '') {
+    errors.push({ eventId: event.id, field: 'label', message: 'label은 필수입니다' });
   }
-  if (!event.title || event.title.trim() === '') {
-    errors.push({ eventId: event.id, field: 'title', message: 'title은 필수입니다' });
+  if (!event.summary || event.summary.trim() === '') {
+    errors.push({ eventId: event.id, field: 'summary', message: 'summary는 필수입니다' });
   }
-  if (!event.description || event.description.trim() === '') {
-    errors.push({ eventId: event.id, field: 'description', message: 'description은 필수입니다' });
+  if (typeof event.lat !== 'number' || typeof event.lng !== 'number') {
+    errors.push({ eventId: event.id, field: 'lat/lng', message: 'lat, lng는 숫자여야 합니다' });
   }
-  if (!VALID_CATEGORIES.includes(event.category)) {
-    errors.push({ eventId: event.id, field: 'category', message: `category는 [${VALID_CATEGORIES.join(', ')}] 중 하나여야 합니다` });
+  if (!Array.isArray(event.tags)) {
+    errors.push({ eventId: event.id, field: 'tags', message: 'tags는 배열이어야 합니다' });
   }
-  if (![1, 2, 3].includes(event.importance)) {
-    errors.push({ eventId: event.id, field: 'importance', message: 'importance는 1, 2, 3 중 하나여야 합니다' });
-  }
-  if (
-    typeof event.location?.lat !== 'number' ||
-    typeof event.location?.lng !== 'number' ||
-    !event.location?.name
-  ) {
-    errors.push({ eventId: event.id, field: 'location', message: 'location에 lat, lng, name이 모두 필요합니다' });
+  if (!Array.isArray(event.causes) || !Array.isArray(event.effects)) {
+    errors.push({ eventId: event.id, field: 'causes/effects', message: 'causes, effects는 배열이어야 합니다' });
   }
 
   return errors;
@@ -59,7 +44,6 @@ export function validateDataset(dataset: HistoryDataset): ValidationResult {
 
   if (!dataset.id) errors.push({ eventId: '(dataset)', field: 'id', message: 'dataset id는 필수입니다' });
   if (!dataset.label) errors.push({ eventId: '(dataset)', field: 'label', message: 'label은 필수입니다' });
-  if (!dataset.region) errors.push({ eventId: '(dataset)', field: 'region', message: 'region은 필수입니다' });
   if (!Array.isArray(dataset.range) || dataset.range.length !== 2) {
     errors.push({ eventId: '(dataset)', field: 'range', message: 'range는 [start, end] 형태여야 합니다' });
   } else if (dataset.range[0] >= dataset.range[1]) {

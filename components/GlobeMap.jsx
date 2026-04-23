@@ -33,7 +33,7 @@ function loadScriptsSequentially(urls) {
   );
 }
 
-function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
+function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady, layers }) {
   const containerRef = useRef(null);
   const globeRef     = useRef(null);
   const leafletRef   = useRef(null);
@@ -103,8 +103,12 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
 
   // === 3D: 영토 업데이트 ===
   useEffect(() => {
-    if (mapMode !== '3d' || !ready || !globeRef.current || !currentTerritories) return;
+    if (mapMode !== '3d' || !ready || !globeRef.current) return;
     const g = globeRef.current;
+    if (!currentTerritories || layers?.territory === false) {
+      g.polygonsData([]);
+      return;
+    }
     const polygons = currentTerritories.polities.map(p => ({
       type: 'Feature',
       properties: { id: p.id, name: p.name, color: p.color },
@@ -117,7 +121,7 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
       .polygonStrokeColor(f => f.properties.color)
       .polygonLabel(f => `<div style="background:rgba(255,255,255,0.96);padding:6px 10px;border-radius:6px;color:#2a251f;font-family:'Noto Sans KR',system-ui,sans-serif;font-size:12px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15)">${f.properties.name}</div>`)
       .polygonsTransitionDuration(600);
-  }, [mapMode, ready, currentTerritories]);
+  }, [mapMode, ready, currentTerritories, layers]);
 
   // === 3D: 사건 핀 업데이트 ===
   useEffect(() => {
@@ -178,7 +182,7 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
     leafletLayersRef.current.markers.forEach(m => map.removeLayer(m));
     leafletLayersRef.current = { polygons: [], markers: [] };
 
-    if (currentTerritories) {
+    if (currentTerritories && layers?.territory !== false) {
       currentTerritories.polities.forEach(p => {
         const latlngs = p.coords.map(([lng, lat]) => [lat, lng]);
         const poly = L.polygon(latlngs, {
@@ -203,7 +207,7 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
       marker.on('click', () => onEventPin && onEventPin(ev));
       leafletLayersRef.current.markers.push(marker);
     });
-  }, [mapMode, currentTerritories, visibleEvents, year, onEventPin]);
+  }, [mapMode, currentTerritories, visibleEvents, year, onEventPin, layers]);
 
   // === 줌 컨트롤 ===
   const zoom = (dir) => {
@@ -322,7 +326,7 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady }) {
   );
 }
 
-export default function GlobeMap(props) {
+export default function GlobeMap({ layers, ...props }) {
   const [mapMode, setMapMode] = useState('3d');
-  return <GlobeMap3D {...props} mapMode={mapMode} setMapMode={setMapMode} />;
+  return <GlobeMap3D {...props} layers={layers} mapMode={mapMode} setMapMode={setMapMode} />;
 }
