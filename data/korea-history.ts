@@ -1,4 +1,5 @@
 import type { HistoryDataset } from '../types/history';
+import { KOREA_TERRITORIES } from '../lib/buildKoreaTerritories';
 
 const koreaHistory: HistoryDataset = {
   id: 'korea-ts',
@@ -118,6 +119,7 @@ const koreaHistory: HistoryDataset = {
       tags: ['건국'], causes: [], effects: [],
     },
   ],
+  territoriesByYear: KOREA_TERRITORIES,
 };
 
 export default koreaHistory;

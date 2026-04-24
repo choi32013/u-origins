@@ -5,19 +5,23 @@ import GlobeMap from './GlobeMap';
 import Timeline from './Timeline';
 import EventModal from './EventModal';
 
-export default function MainPrototype({ dataset, compact = false }) {
+export default function MainPrototype({ dataset, datasets = [], activeId, setActiveId, compact = false }) {
   const [year, setYear] = useState(dataset.range[0] + Math.floor((dataset.range[1] - dataset.range[0]) * 0.6));
   const [playing, setPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(8);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [layers, setLayers] = useState({ territory: true, capital: false, religion: false });
-  // geoReady: true once coastline geo-data is available in the browser
   const [geoReady, setGeoReady] = useState(false);
 
   useEffect(() => {
-    // Signal ready immediately; coastline data loaded from static imports in Next.js
     setGeoReady(true);
   }, []);
+
+  useEffect(() => {
+    setYear(dataset.range[0] + Math.floor((dataset.range[1] - dataset.range[0]) * 0.6));
+    setPlaying(false);
+    setSelectedEvent(null);
+  }, [dataset.id]);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') setSelectedEvent(null); };
@@ -57,23 +61,25 @@ export default function MainPrototype({ dataset, compact = false }) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{ display: 'flex', gap: 4, background: '#f4f1e8', padding: 3, borderRadius: 6 }}>
-          {['한국사', '동아시아', '세계사'].map((label, i) => (
-            <button key={label} disabled={i !== 0}
-              style={{
-                padding: '5px 11px', borderRadius: 4, border: 'none',
-                background: i === 0 ? '#fff' : 'transparent',
-                color: i === 0 ? '#2a251f' : '#b8b2a0',
-                fontSize: 12, fontWeight: i === 0 ? 600 : 500,
-                cursor: i === 0 ? 'pointer' : 'not-allowed',
-                fontFamily: 'inherit',
-                boxShadow: i === 0 ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              }}
-            >
-              {label}{i !== 0 && ' 곧'}
-            </button>
-          ))}
-        </div>
+        {datasets.length > 1 && (
+          <div style={{ display: 'flex', gap: 4, background: '#f4f1e8', padding: 3, borderRadius: 6 }}>
+            {datasets.map((ds) => (
+              <button key={ds.id} onClick={() => setActiveId && setActiveId(ds.id)}
+                style={{
+                  padding: '5px 11px', borderRadius: 4, border: 'none',
+                  background: ds.id === activeId ? '#fff' : 'transparent',
+                  color: ds.id === activeId ? '#2a251f' : '#6b6a63',
+                  fontSize: 12, fontWeight: ds.id === activeId ? 600 : 500,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  boxShadow: ds.id === activeId ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {ds.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 4, background: '#f4f1e8', padding: 3, borderRadius: 6 }}>
           {[{ id: 'territory', label: '영토' }, { id: 'religion', label: '종교' }, { id: 'capital', label: '수도' }].map(l => (

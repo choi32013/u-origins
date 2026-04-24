@@ -1,4 +1,89 @@
-import type { HistoryDataset } from '../types/history';
+import type { HistoryDataset, TerritorySnapshot } from '../types/history';
+
+// Approximate polygons — [lng, lat] pairs, clockwise.
+// These are simplified outlines; accuracy ± ~50km is acceptable for historical visualization.
+
+// -700: Latium / early Kingdom (central Italy only)
+const LATIUM: [number, number][] = [
+  [12.5, 42.5], [13.5, 42.2], [14.5, 41.0], [15.0, 39.8], [14.0, 38.0],
+  [11.5, 38.0], [9.5, 40.0], [8.5, 42.0], [9.5, 44.0], [11.0, 44.2],
+  [12.5, 44.5], [13.5, 43.5], [12.5, 42.5],
+];
+
+// -200: Italian peninsula (Rome controls all Italy after Punic Wars begin)
+const ITALY: [number, number][] = [
+  [7.0, 44.0], [8.0, 46.0], [10.0, 47.5], [12.5, 47.0], [13.5, 46.5],
+  [15.5, 45.8], [18.0, 40.5], [16.0, 38.0], [15.5, 37.0], [13.5, 37.5],
+  [12.5, 37.5], [11.0, 37.8], [8.0, 38.0], [7.5, 40.0], [7.0, 42.0],
+  [7.0, 44.0],
+];
+
+// -100: Italian peninsula + Sicily, Sardinia, Corsica, parts of Spain + N Africa coast
+const LATE_REPUBLIC: [number, number][] = [
+  [-6.0, 36.0], [-5.0, 37.5], [-7.0, 40.0], [-8.0, 43.0], [-5.0, 44.0],
+  [-2.0, 44.5], [3.0, 43.0], [5.0, 43.5], [7.0, 43.5],
+  [8.0, 46.0], [10.5, 47.5], [13.0, 47.2], [15.5, 45.8],
+  [18.0, 40.5], [16.0, 37.5], [15.0, 37.0], [12.0, 37.5],
+  [12.0, 33.0], [10.0, 33.0], [8.0, 33.5], [5.0, 33.0], [0.0, 33.0],
+  [-3.0, 34.0], [-5.5, 35.8], [-5.0, 37.0], [-6.0, 36.0],
+];
+
+// 117 CE: Peak empire — Trajan's expansion (largest extent)
+const PEAK_EMPIRE: [number, number][] = [
+  [-8.0, 42.0], [-4.0, 44.5], [-2.0, 48.5], [1.5, 51.0], [4.5, 53.0],
+  [6.5, 52.5], [8.5, 51.5], [10.0, 53.5], [12.5, 55.5], [14.0, 54.0],
+  [18.0, 52.0], [22.0, 48.5], [24.5, 46.5], [28.0, 46.0], [30.5, 44.0],
+  [32.0, 42.0], [36.5, 36.5], [40.0, 37.5], [44.0, 36.0], [44.5, 32.0],
+  [42.0, 28.0], [37.0, 24.0], [32.0, 23.0], [28.0, 24.0], [23.0, 28.5],
+  [17.0, 28.5], [12.0, 28.0], [6.0, 28.0], [0.0, 29.5], [-4.0, 31.0],
+  [-6.0, 33.0], [-6.0, 36.0], [-5.0, 37.0], [-8.0, 40.0], [-8.0, 42.0],
+];
+
+// 400 CE: Western Empire shrinking; Eastern intact
+const LATE_EMPIRE_WEST: [number, number][] = [
+  [-8.0, 42.0], [-4.0, 44.5], [-2.0, 48.5], [1.5, 51.0], [4.5, 53.0],
+  [6.5, 52.5], [8.5, 50.5], [10.0, 48.0], [13.0, 48.0], [15.0, 48.5],
+  [18.0, 46.0], [20.0, 44.0], [22.0, 43.0], [24.5, 43.5],
+  [28.5, 42.0], [30.5, 38.5], [28.0, 36.0], [24.0, 36.5],
+  [18.0, 38.0], [15.0, 37.5], [12.0, 37.5], [9.0, 33.0],
+  [5.0, 33.0], [0.0, 33.0], [-3.0, 34.0], [-5.5, 35.8], [-5.0, 37.0],
+  [-6.0, 36.0], [-8.0, 40.0], [-8.0, 42.0],
+];
+
+const ROME_TERRITORIES: TerritorySnapshot[] = [
+  {
+    year: -700,
+    polities: [{ id: 'latium', name: '왕정 로마', color: '#8B6F47', coords: LATIUM }],
+  },
+  {
+    year: -500,
+    polities: [{ id: 'early_republic', name: '공화정 로마 (초기)', color: '#7A8C6B', coords: LATIUM }],
+  },
+  {
+    year: -200,
+    polities: [{ id: 'republic', name: '로마 공화국', color: '#6B8C7A', coords: ITALY }],
+  },
+  {
+    year: -100,
+    polities: [{ id: 'late_republic', name: '로마 공화국 (후기)', color: '#5A7A8C', coords: LATE_REPUBLIC }],
+  },
+  {
+    year: 0,
+    polities: [{ id: 'early_empire', name: '로마 제국 (아우구스투스)', color: '#C25B3F', coords: LATE_REPUBLIC }],
+  },
+  {
+    year: 117,
+    polities: [{ id: 'peak_empire', name: '로마 제국 (전성기)', color: '#C25B3F', coords: PEAK_EMPIRE }],
+  },
+  {
+    year: 300,
+    polities: [{ id: 'late_empire', name: '로마 제국 (후기)', color: '#A0483A', coords: LATE_EMPIRE_WEST }],
+  },
+  {
+    year: 400,
+    polities: [{ id: 'declining_empire', name: '로마 제국 (쇠퇴기)', color: '#8B3A30', coords: LATE_EMPIRE_WEST }],
+  },
+];
 
 const romeHistory: HistoryDataset = {
   id: 'rome',
@@ -60,6 +145,7 @@ const romeHistory: HistoryDataset = {
       tags: ['멸망'], causes: ['ro_empire_split'], effects: [],
     },
   ],
+  territoriesByYear: ROME_TERRITORIES,
 };
 
 export default romeHistory;
