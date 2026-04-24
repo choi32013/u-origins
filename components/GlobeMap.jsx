@@ -315,11 +315,20 @@ function GlobeMap3D({ year, data, onEventPin, mapMode, setMapMode, geoReady, lay
       {!ready && (
         <div style={{
           position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#8a8578', fontSize: 13,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          gap: 14,
           fontFamily: "'Noto Sans KR', system-ui, sans-serif",
         }}>
-          {mapMode === '3d' ? '지구본 불러오는 중…' : '지도 불러오는 중…'}
+          <style>{`@keyframes u-spin{to{transform:rotate(360deg)}}`}</style>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            border: '3px solid #eae5d8',
+            borderTopColor: '#c25b3f',
+            animation: 'u-spin 0.75s linear infinite',
+          }} />
+          <div style={{ fontSize: 12, color: '#8a8578', letterSpacing: 0.3 }}>
+            {mapMode === '3d' ? '지구본 불러오는 중…' : '지도 불러오는 중…'}
+          </div>
         </div>
       )}
     </div>
